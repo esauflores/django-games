@@ -1,4 +1,25 @@
 {% extends "layouts/Layout.jinja" %}
 {% block content %}
-    <h1>Hello {{ name }}</h1>
+    <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
+        <div class="mr-auto place-self-center lg:col-span-7">
+            <h1 class="max-w-2xl mb-4 text-4xl text-black">Childhood Games</h1>
+            <br>
+            <p class="max-w-2xl mb-6 font-light lg:mb-8 md:text-md lg:text-lg text-gray-700">
+                Your classic childhood games, now available online.
+                <br>
+                Play with your classmates, friends, or family members.
+                <div class="flex flex-col items-center justify-center">
+                    <a href='{{ url_for("tic-tac-toe") }}'
+                       class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100">
+                        Start now
+                    </a>
+                </div>
+            </p>
+        </div>
+        <!-- align right in the center -->
+        <div class="place-self-center lg:col-span-5">
+            <img src="{{ static("images/tic-tac-toe.png") }}" alt="Game Image" height="350" width="350">
+        </div>
+    </div>
+</div>
 {% endblock content %}
