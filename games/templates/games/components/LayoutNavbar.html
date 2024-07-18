@@ -1,0 +1,84 @@
+<header>
+    <nav class="bg-white border-gray-200">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2">
+            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="flex justify-between items-center">
+                    <span class="text-2xl text-gray-800 font-semibold whitespace-nowrap pr-4">
+                        {% set width = "220px" %}
+                        {% set height = "55px" %}
+                        {% include "games/components/Logo.html" %}
+                    </span>
+                </div>
+            </a>
+            <button data-collapse-toggle="navbar-dropdown"
+                    type="button"
+                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                    aria-controls="navbar-dropdown"
+                    aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-5 h-5"
+                     aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+            </button>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-dropdown">
+                <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white">
+                    {% set url = request.path %}
+                    {% for link in navbarMenu %}
+                        <li class="flex justify-center align-bottom">
+                            {% if url == link['url'] %}
+                                <a href="{{ link['url'] }}"
+                                   class="text-lg block px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0">{{ link['label'] }}</a>
+                            {% else %}
+                                <a href="{{ link['url'] }}"
+                                   class="text-lg block px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">{{ link['label'] }}</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                    {% if false %}
+                        <li>
+                            <hr class="md:hidden my-4 w-full h-0.5 mx-auto bg-gray-700 border-0 rounded md:my-5">
+                            <button type="button"
+                                    class="flex align-middle p-1 mx-4 text-sm rounded-none md:mr-0 md:focus:ring-2 focus:ring-gray-700"
+                                    id="user-menu-button"
+                                    aria-expanded="false"
+                                    data-dropdown-toggle="dropdown">
+                                <span class="sr-only">Open user menu</span>
+                                <img class="w-8 h-8 aspect-square object-cover"
+                                     src="#"
+                                     height="32"
+                                     width="32"
+                                     alt="user photo">
+                                <span class="text-gray-900 mx-4 mt-1.5">username</span>
+                            </button>
+                            {# Dropdown menu  #}
+                            <div class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow !ml-10"
+                                 id="dropdown">
+                                <ul class="py-1 text-gray-500" aria-labelledby="dropdown">
+                                    <li>
+                                        <form action='#' method="post">
+                                            <button class="w-full block py-2 px-4 text-sm hover:bg-gray-100"
+                                                    type="submit">Sign out</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>
+                            <p class="block px-3 md:p-0">
+                                <a href="#" class="text-blue-600 underline hover:no-underline text-lg">Login</a>
+                                /
+                                <a href="#" class="text-blue-600 underline hover:no-underline text-lg">Sign Up</a>
+                            </p>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <hr class="mb-8">
+</header>
