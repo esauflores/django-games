@@ -1,0 +1,89 @@
+{% extends "layouts/Layout.jinja" %}
+{% block content %}
+    {# Game over message #}
+    <div class="flex justify-center gap-10">
+        <div class="flex flex-col items-center" id="game-over">
+            <h2 class="text-4xl font-bold text-green-700">Game Over</h2>
+            <p class="text-2xl font-bold" id="result"></p>
+        </div>
+    </div>
+    {# Turn message #}
+    <div class="flex justify-center gap-10 mt-4">
+        <div class="flex flex-wrap items-center">
+            <h2 class="text-2xl font-bold">
+                Turn: &nbsp
+                <h2 class="turn--x text-red-500 text-2xl font-bold">X</h2>
+            </h2>
+        </div>
+        <hr class="mb-4">
+    </div>
+    <div class="mt-8 flex flex-col items-center gap-4 board" id="tic-tac-toe">
+        {% for i in range(3) %}
+            <div class="flex flex-wrap justify-center gap-4 row" id="row-{{ i }}">
+                {% for j in range(3) %}
+                    {% if (i+j)%3 == 0 %}
+                        <div class="cell cell--x bg-white p-4 rounded-lg shadow-md"
+                             id="cell-{{ i }}-{{ j }}">
+                            {% set width = "50px" %}
+                            {% set height = "50px" %}
+                            {% include "components/FigureX.jinja" %}
+                        </div>
+                    {% elif (i+j)%3 == 1 %}
+                        <div class="cell cell--o bg-white p-4 rounded-lg shadow-md"
+                             id="cell-{{ i }}-{{ j }}">
+                            {% set width = "50px" %}
+                            {% set height = "50px" %}
+                            {% include "components/FigureO.jinja" %}
+                        </div>
+                    {% else %}
+                        <div class="cell bg-white p-4 rounded-lg shadow-md"
+                             id="cell-{{ i }}-{{ j }}"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    <style>
+    .cell {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        border: 1px solid #333;
+        cursor: pointer;
+    }
+
+    .turn--x {
+        color: #f00;
+    }
+
+    .turn--o {
+        color: #00f;
+    }
+
+    .cell--x {
+        cursor: not-allowed !important;
+    }
+
+    .cell--o {
+        cursor: not-allowed !important;
+    }
+
+    .cell--x path {
+        stroke: #f00 !important;
+        fill: #f00 !important;
+    }
+    .cell--o .outer-circle {
+        stroke: #00f !important;
+        fill: #00f !important;
+    }
+
+    .cell--o .inner-circle {
+        stroke: #fff !important;
+        fill: #fff !important;
+    }
+
+    </style>
+{% endblock content %}
