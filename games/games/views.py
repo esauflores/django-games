@@ -7,8 +7,7 @@ app = NinjaAPI()
 
 navbar = [
     {"label": "Home", "url": "/"},
-    {"label": "Games", "url": "/games"},
-    {"label": "About", "url": "/about"},
+    {"label": "Tic-Tac-Toe", "url": "/tic-tac-toe"},
 ]
 
 
@@ -20,5 +19,5 @@ def index(request, name: str = "World"):
 
 @app.get("/tic-tac-toe")
 def tic_tac_toe(request):
-    context = {"title": "Tic Tac Toe", "navbarMenu": navbar}
+    context = {"navbarMenu": navbar}
     return render(request, "tic-tac-toe.jinja", context)
