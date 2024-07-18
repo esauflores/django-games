@@ -5,7 +5,14 @@ from ninja import NinjaAPI
 app = NinjaAPI()
 
 
+navbar = [
+    {"label": "Home", "url": "/"},
+    {"label": "Games", "url": "/games"},
+    {"label": "About", "url": "/about"},
+]
+
+
 @app.get("/")
 def index(request, name: str = "World"):
-    context = {"name": name}
-    return render(request, "index.html", context)
+    context = {"name": name, "navbarMenu": navbar}
+    return render(request, "games/index.html", context)
