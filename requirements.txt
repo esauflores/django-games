@@ -2,3 +2,4 @@ Django
 Black
 Jinja2
 djlint
+channels["daphne"]

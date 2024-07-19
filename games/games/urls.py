@@ -18,11 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path  # Include the include function
 
-from .views import *
-
+from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", index, name="index"),
-    path("tic-tac-toe/", tic_tac_toe, name="tic-tac-toe"),
+    path("", views.index, name="index"),
+    path("tic-tac-toe/", views.tic_tac_toe, name="tic-tac-toe"),
 ]
