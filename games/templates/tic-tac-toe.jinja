@@ -45,23 +45,29 @@
     </style>
 {% endblock styles %}
 {% block content %}
-    {# Game over message #}
+    {# buttons and player id at the right #}
+    <div class="flex justify-between items-center px-4 py-2">
+        <div class="flex gap-4">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded invisible">
+                <a href='{{ url_for("index") }}'>Back</a>
+            </button>
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded invisible">
+                <a href='{{ url_for("tic-tac-toe") }}'>Refresh</a>
+            </button>
+        </div>
+        <div>
+            <span class="text-lg font-bold" id="player-id">Player ID:</span>
+        </div>
+    </div>
+    {# Status #}
     <div class="flex justify-center gap-10">
-        <div class="flex flex-col items-center invisible" id="game-over">
-            <h2 class="text-4xl font-bold text-green-700">Game Over</h2>
-            <p class="text-2xl font-bold" id="result">X</p>
+        <div class="flex flex-col items-center">
+            <h2 class="text-4xl font-bold" id="status">Waiting for players...</h2>
         </div>
     </div>
-    {# Turn message #}
-    <div class="flex justify-center gap-10 mt-4" id="player-turn-container">
-        <div class="flex flex-wrap items-center">
-            <h2 class="text-2xl font-bold">
-                Turn: &nbsp
-                <h2 class="turn--x text-2xl font-bold" id="player-turn">Player 1</h2>
-            </h2>
-        </div>
-    </div>
-    <div class="mt-8 flex flex-col items-center gap-4 board" id="tic-tac-toe">
+    {# Board #}
+    <div class="mt-8 flex flex-col items-center gap-4 board invisible"
+         id="tic-tac-toe">
         {% for i in range(3) %}
             <div class="flex flex-wrap justify-center gap-4 row" id="row-{{ i }}">
                 {% for j in range(3) %}
@@ -74,30 +80,102 @@
 {% endblock content %}
 {% block scripts %}
     <script type="module">
-        import TicTacToe from "{{ static('js/games/tic-tac-toe.js') }}";
-        import Player from "{{ static('js/player.js') }}";
-        const game = new TicTacToe(new Player('Player 1', 'X'), new Player('Player 2', 'O'));
+        let url = `ws://${window.location.host}/ws/tic-tac-toe/`
+        const lobbySocket = new WebSocket(url);
 
-        
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
+
+        // string id 7 random characters
+        const id = Math.random().toString(36).substring(2, 9);
+
+        document.getElementById('player-id').innerHTML = `Player ID: ${id}`;
+
+        lobbySocket.onopen = function (e) {
+            lobbySocket.send(JSON.stringify(
+                {
+                    "type": "add_player", 
+                    "player": {
+                    "name": "Player " + id,
+                    "id": id
+                    }
+                }
+            ));
+        };
+
+        lobbySocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+
+            if(data.type == "game_state"){
+                print_board(data.game);
+            }
+        };
+
+        for (let i = 0; i < 3; i++){
+            for(let j = 0; j < 3; j++){
                 const cell = document.getElementById(`cell-${i}-${j}`);
-                cell.addEventListener('click', () => {
-                    if (game.board.grid[i][j] != null || game.game_over) return;
+                 cell.addEventListener('click', () => {                            
+                        lobbySocket.send(
+                            JSON.stringify({
+                                    "type": "make_move",
+                                    "player": {
+                                        "name": "Player " + id,
+                                        "id": id
+                                    },
+                                    "row": i,
+                                    "col": j
+                                })
+                            );
+                        }
+                    )
+            }
+        }
 
-                    if (game.current_player == 0) {
-                        cell.classList.add('cell--x');
+
+        function print_board(game){
+            if (!game.game_start) return;
+            
+            document.getElementById('tic-tac-toe').classList.remove('invisible');
+
+
+            if (game.game_over){
+                let message = 'Draw';
+
+                if (game.winner){
+                   if (game.winner == id){
+                        message = 'You Win';
+                    }
+                    else{
+                        message = 'You Lose';
+                    }
+                }
+
+                document.getElementById('status').innerHTML = `Game Over: ${message}`;
+            }
+            else{
+                document.getElementById('status').innerHTML = `Turn: ${game.players[game.turn%2].id}`;
+            }
+
+
+            for (let i = 0; i < 3; i++){
+                for(let j = 0; j < 3; j++){
+                    const cell = document.getElementById(`cell-${i}-${j}`);
+                    cell.classList.remove('cell--x', 'cell--o');
+                    
+                    if(game.game_over){
+                        cell.classList.add('cursor-not-allowed');
+                    }
+
+                    if (game.board[i][j] == game.players[0].id){
+                        cell.classList.add('cell--x', 'cursor-not-allowed');
                         cell.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100px" height="100px" viewBox="0 0 256 256" xml:space="preserve">
                                     <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
                                     <path d="M 11 90 c -2.815 0 -5.63 -1.074 -7.778 -3.222 c -4.295 -4.296 -4.295 -11.261 0 -15.557 l 68 -68 c 4.297 -4.296 11.26 -4.296 15.557 0 c 4.296 4.296 4.296 11.261 0 15.557 l -68 68 C 16.63 88.926 13.815 90 11 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(214,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-                                    <path d="M 79 90 c -2.815 0 -5.63 -1.074 -7.778 -3.222 l -68 -68 c -4.295 -4.296 -4.295 -11.261 0 -15.557 c 4.296 -4.296 11.261 -4.296 15.557 0 l 68 68 c 4.296 4.296 4.296 11.261 0 15.557 C 84.63 88.926 81.815 90 79 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(214,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-                                    </g>
+                                    <path d="M 79 90 c -2.815 0 -5.63 -1.074 -7.778 -3.222 l -68 -68 c -4.295 -4.296 -4.295 -11.261 0 -15.557 c 4.296 -4.296 11.261 -4.296 15.557 0 l 68 68 c 4.296 4.296 4.296 11.261 0 15.557 C 84.63 88.926 81.
                                 </svg>
                         `;
-                     
-                    } else {
-                        cell.classList.add('cell--o');
+                    }
+                    else if (game.board[i][j] == game.players[1].id){
+                        cell.classList.add('cell--o', 'cursor-not-allowed');
                         cell.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="40" stroke="black" stroke-width="2" fill="none" class="outer-circle" />
@@ -105,41 +183,9 @@
                             </svg>
                         `;
                     }
-
-                    game.makeMove(i, j);
-
-                    // change player turn
-
-                    if (game.game_over) {
-                        document.getElementById('game-over').classList.remove('invisible');
-                        document.getElementById('player-turn-container').classList.add('invisible');
-
-                        if (game.winner === null) {
-                            document.getElementById('result').textContent = 'It\'s a draw!';
-                        } else {
-                            if (game.winner === 0) {
-                                document.getElementById('result').textContent = 'Player 1 wins!';
-                                document.getElementById('result').classList.add('turn--x');
-                            } else {
-                                document.getElementById('result').textContent = 'Player 2 wins!';
-                                document.getElementById('result').classList.add('turn--o');
-                            }
-                        }
-                    }
-                    else{
-                        if(document.getElementById('player-turn').textContent == 'Player 1'){
-                            document.getElementById('player-turn').textContent = 'Player 2';
-                            document.getElementById('player-turn').classList.add('turn--o');
-                            document.getElementById('player-turn').classList.remove('turn--x');
-                        }
-                        else{
-                            document.getElementById('player-turn').textContent = 'Player 1';
-                            document.getElementById('player-turn').classList.add('turn--x');
-                            document.getElementById('player-turn').classList.remove('turn--o');
-                        }
-                    }
-                });
+                }
             }
         }
+      
     </script>
 {% endblock scripts %}
