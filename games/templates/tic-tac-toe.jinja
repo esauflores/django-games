@@ -56,7 +56,7 @@
             </button>
         </div>
         <div>
-            <span class="text-lg font-bold" id="player-id">Player ID:</span>
+            <span class="text-lg font-bold" id="room-id">Room ID: {{ room_id }}</span>
         </div>
     </div>
     {# Status #}
@@ -80,23 +80,23 @@
 {% endblock content %}
 {% block scripts %}
     <script type="module">
-        let url = `ws://${window.location.host}/ws/tic-tac-toe/`
+        const room_id = "{{ room_id }}";
+        let url = `ws://${window.location.host}/ws/tic-tac-toe/${room_id}/`;
         const lobbySocket = new WebSocket(url);
 
+        console.log("{{ room_id }}");
 
         // string id 7 random characters
-        const id = Math.random().toString(36).substring(2, 9);
-
-        document.getElementById('player-id').innerHTML = `Player ID: ${id}`;
+        const id = "{{ player_id }}"
 
         lobbySocket.onopen = function (e) {
             lobbySocket.send(JSON.stringify(
                 {
                     "type": "add_player", 
                     "player": {
-                    "name": "Player " + id,
-                    "id": id
-                    }
+                        "name": "Player " + id,
+                        "id": id
+                    },
                 }
             ));
         };
@@ -121,7 +121,7 @@
                                         "id": id
                                     },
                                     "row": i,
-                                    "col": j
+                                    "col": j,
                                 })
                             );
                         }
@@ -148,10 +148,16 @@
                     }
                 }
 
-                document.getElementById('status').innerHTML = `Game Over: ${message}`;
+                document.getElementById('status').innerHTML = `${message}`;
             }
             else{
-                document.getElementById('status').innerHTML = `Turn: ${game.players[game.turn%2].id}`;
+
+                if (game.players[game.turn%2].id == id){
+                    document.getElementById('status').innerHTML = `Your Turn`;
+                }
+                else{
+                    document.getElementById('status').innerHTML = `Opponent's Turn`;
+                }
             }
 
 

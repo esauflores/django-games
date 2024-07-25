@@ -1,7 +1,9 @@
-from django.urls import re_path
+from django.urls import path
 
 from . import consumers
 
+# tic-tac-toe routing
+# ws/tic-tac-toe/<room_id>/
 websocket_urlpatterns = [
-    re_path(r"ws/tic-tac-toe/", consumers.TicTacToeConsumer.as_asgi()),
+    path("ws/tic-tac-toe/<str:room_id>/", consumers.TicTacToeConsumer.as_asgi()),
 ]

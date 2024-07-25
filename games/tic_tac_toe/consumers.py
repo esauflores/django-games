@@ -15,12 +15,16 @@ class TicTacToeConsumer(WebsocketConsumer):
     def connect(self):
         self.room_group_name = "tic_tac_toe"
 
+        self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
+
         # Increment the number of players in the game
-        users_count = cache.get("tic_tac_toe_users_count", 0)
-        cache.set("tic_tac_toe_users_count", users_count + 1)
+        users_count = cache.get("tic_tac_toe_users_count_{}".format(self.room_id), 0)
+        cache.set("tic_tac_toe_users_count_{}".format(self.room_id), users_count + 1)
+
+        print(users_count + 1)
 
         if users_count == 0:
-            cache.set("tic_tac_toe", None)
+            cache.set("tic_tac_toe_{}".format(self.room_id), None)
 
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
@@ -55,14 +59,15 @@ class TicTacToeConsumer(WebsocketConsumer):
     def add_player(self, event):
         player = player_from_json(event["player"])
 
-        game_state = cache.get("tic_tac_toe")
+        game_state = cache.get("tic_tac_toe_{}".format(self.room_id))
+
         if not game_state:
             game = TicTacToe()
         else:
             game = TicTacToe.from_dict(game_state)
 
         game.add_player(player)
-        cache.set("tic_tac_toe", game.to_dict())
+        cache.set("tic_tac_toe_{}".format(self.room_id), game.to_dict())
 
         self.send(text_data=json.dumps({"type": "game_state", "game": game.to_dict()}))
 
@@ -71,7 +76,7 @@ class TicTacToeConsumer(WebsocketConsumer):
         row = event["row"]
         col = event["col"]
 
-        game_state = cache.get("tic_tac_toe")
+        game_state = cache.get("tic_tac_toe_{}".format(self.room_id))
         if not game_state:
             game = TicTacToe()
         else:
@@ -81,14 +86,17 @@ class TicTacToeConsumer(WebsocketConsumer):
 
         print(result)
 
-        cache.set("tic_tac_toe", game.to_dict())
+        cache.set("tic_tac_toe_{}".format(self.room_id), game.to_dict())
 
         self.send(text_data=json.dumps({"type": "game_state", "game": game.to_dict()}))
 
     def disconnect(self, close_code):
         # Decrement the number of players in the game
-        users_count = cache.get("tic_tac_toe_users_count", 0)
-        cache.set("tic_tac_toe_users_count", users_count - 1)
+        users_count = cache.get("tic_tac_toe_users_count_{}".format(self.room_id), 0)
+        cache.set("tic_tac_toe_users_count_{}".format(self.room_id), users_count - 1)
+
+        if users_count - 1 == 0:
+            cache.delete("tic_tac_toe_{}".format(self.room_id))
 
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
