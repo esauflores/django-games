@@ -17,6 +17,9 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path  # Include the include function
+from django.conf import settings
+
+from django.conf.urls.static import static
 
 from . import views
 
@@ -25,4 +28,6 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("tic-tac-toe/", views.tic_tac_toe, name="tic-tac-toe"),
     path("tic-tac-toe/<str:room_id>/", views.tic_tac_toe, name="tic-tac-toe"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+print(urlpatterns)
