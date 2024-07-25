@@ -21,8 +21,6 @@ class TicTacToeConsumer(WebsocketConsumer):
         users_count = cache.get("tic_tac_toe_users_count_{}".format(self.room_id), 0)
         cache.set("tic_tac_toe_users_count_{}".format(self.room_id), users_count + 1)
 
-        print(users_count + 1)
-
         if users_count == 0:
             cache.set("tic_tac_toe_{}".format(self.room_id), None)
 
@@ -83,8 +81,6 @@ class TicTacToeConsumer(WebsocketConsumer):
             game = TicTacToe.from_dict(game_state)
 
         result = game.make_move(player, row, col)
-
-        print(result)
 
         cache.set("tic_tac_toe_{}".format(self.room_id), game.to_dict())
 
