@@ -81,7 +81,7 @@
 {% block scripts %}
     <script type="module">
         const room_id = "{{ room_id }}";
-        let url = `ws://${window.location.host}/ws/tic-tac-toe/${room_id}/`;
+        let url = `wss://${window.location.host}/ws/tic-tac-toe/${room_id}/`;
         const lobbySocket = new WebSocket(url);
 
         console.log("{{ room_id }}");
