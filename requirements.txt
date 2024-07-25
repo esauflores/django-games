@@ -1,5 +1,6 @@
 Django
 Black
+python-dotenv
 Jinja2
 djlint
 channels[daphne]
