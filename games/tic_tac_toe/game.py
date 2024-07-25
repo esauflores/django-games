@@ -51,7 +51,7 @@ class TicTacToe:
         if row < 0 or row > 2 or col < 0 or col > 2:  # Invalid move
             return "Invalid move"
 
-        if self.board[row][col] is not "":  # Position already taken
+        if self.board[row][col] != "":  # Position already taken
             return "Invalid move"
 
         if player != self.players[self.turn % 2]:  # Not player's turn
